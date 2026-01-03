@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  sentinel:
+    build: .
+    container_name: sentinel_bot
+    restart: always  # Если упадет — поднимется сам. Если сервер перезагрузится — запустится.
+    environment:
+      - RUST_LOG=info
+      # Пробрасываем токен (он возьмется из твоего .env файла на хосте)
+      - TELOXIDE_TOKEN=${TELOXIDE_TOKEN}
+      # ВАЖНО: Внутри докера путь к базе будет в папке /app/data
+      - DATABASE_URL=sqlite:data/sentinel.db
+    volumes:
+      # Мапим папку data внутри контейнера на папку sentinel_data на твоем диске.
+      # Так база НЕ удалится при обновлении контейнера.
+      - ./sentinel_data:/app/data
+    env_file:
+      - .env
